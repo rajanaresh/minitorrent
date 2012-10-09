@@ -1,57 +1,72 @@
+package bencoding;
+
 import java.net.URL;
+
+import java.io.IOException;
+import java.io.FileNotFoundException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
 public class TorrentFile {
 
-        public TorrentFile(String file) {
-                this(new Bencoding(file));
+        public TorrentFile(String file) throws FileNotFoundException {
+                this(new RecursiveBencoding(file));
         }
         public TorrentFile(Bencoding ben) {
                 this.ben = ben;
         }
-        
-        public URL getAnnounce() {
-                URL url = new URL(ben.get("announce"));
-                return url;
-                
-        }
         public void init() {
-                ben.parse();
+                try {
+                        root = (HashMap)ben.parse();
+                } catch(IOException e) {
+                        e.printStackTrace();
+                }
         }
-                
+        public URL getAnnounce() throws Exception {
+                URL url = new URL((String)root.get("announce"));
+                return url;
+        }
+                        
         //optional
-        public List getAnnounceList() {}
+        //public List getAnnounceList() {}
         
         public int getPieceLength() {
                 HashMap infohash = getInfo();
-                return infohash.get("piece length");
+                Integer i = (Integer)infohash.get("piece length");
+                return i.intValue();
         }        
         public String getPieces() {
                 HashMap infohash = getInfo();
-                return infohash.get("pieces");
+                return (String)infohash.get("pieces");
         }
-        public List getPiecesList() {
+        /**
+           public List getPiecesList() {
                 String str = getPieces();
 
                 //return an ArrayList;
-        }        
+        }
+        
         public String getName() {
                 
         }
+        */
         public int getFileLength() {
                 HashMap infohash = getInfo();
-                return infohash.get("length");
+                Integer i = (Integer)infohash.get("length");
+                return i.intValue();
         }
         
         //optional
-        public String getMD5Checksum() {}
+        //public String getMD5Checksum() {}
 
         /**PRIVATE*/
         private HashMap getInfo() {
-                HashMap infomap = ben.get("info");
+                HashMap infomap = (HashMap)root.get("info");
+                return infomap;
         }
 
         private Bencoding ben;
+        private HashMap root;
 }
