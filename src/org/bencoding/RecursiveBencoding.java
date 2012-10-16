@@ -1,4 +1,4 @@
-package bencoding;
+package org.bencoding;
 
 import java.io.InputStream;
 import java.io.BufferedInputStream;
@@ -44,7 +44,7 @@ class RecursiveBencoding implements Bencoding {
                         while((c=(char)r.read()) != 'e') {
                                 r.reset();
                                 key = (String)parse();
-                                value = parse();
+                                value = parse();                                
                                 ((HashMap)x).put(key, value);
                                 r.mark(3);
                         }

@@ -1,4 +1,4 @@
-package bencoding;
+package org.bencoding;
 
 import java.io.IOException;
 
