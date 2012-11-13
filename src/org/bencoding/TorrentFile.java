@@ -23,8 +23,11 @@ public class TorrentFile {
         public TorrentFile(String file, Bencoding ben) {
                 this.file = file;
                 this.ben = ben;
+                init();
         }
-        public void init() {
+
+        /**PRIVATE*/
+        private void init() {
                 try {
                         root = (HashMap)ben.parse();
                 } catch(IOException e) {
@@ -128,7 +131,7 @@ public class TorrentFile {
 
                 //getting the 20 byte SHA-1 hash
                 byte[] sha = mesg.digest(infodict);
-
+                
                 return sha;
         }
 

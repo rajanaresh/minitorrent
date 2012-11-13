@@ -1,77 +1,47 @@
+package org;
+
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.net.URLEncoder;
 import java.net.InetAddress;
 import java.util.*;
 import java.io.*;
+import org.apache.commons.codec.net.URLCodec;
 
-public class Utils {
+import org.bencoding.*;
+
+public class Test {
         public static void main(String[] args) throws Exception {
-                MessageDigest mesg = MessageDigest.getInstance("SHA-1");
-                
-                InetAddress inet = InetAddress.getByName("localhost");
-                byte[] address = inet.getAddress();
 
-                System.out.println(inet.getHostAddress());
+                TorrentFile file = new TorrentFile("./src/org/bencoding/file3.torrent");
                                                 
-                byte[] sha = mesg.digest(address);
-                String sha1 = new String(sha);
-                System.out.println(sha1);
+                String u = file.getAnnounce().toString();
+                u = u.concat("?info_hash=");
 
-                String urlsha1 = URLEncoder.encode(sha1, "UTF-8");
-                System.out.println(urlsha1);
-
-        }
-
-        public static byte[] getInfoHashSHA1(String torrentfile) {
+                byte[] infohash = file.getInfoHashSHA1();
                 
-                InputStream in = new BufferedInputStream(new FileInputStream(torrentfile));
-                int c = in.read();
+                URLCodec codec = new URLCodec();
+                infohash = codec.encode(infohash);
+
+                String urlencodedhash = new String(infohash);
+                u = u.concat(urlencodedhash);
+
+                u = u.concat("&peer_id=12345678901234567890&uploaded=0&downloaded=0&left=1000&event=started");
+                URL url = new URL(u);
+                System.out.println(" ");
+                System.out.println(url);
+                
+                InputStream in = url.openStream();
+                int c = 0;
                 char ch = (char)c;
-                byte[] check = new byte[4];
-                byte b = 0;
-
-                List<Byte> list = new ArrayList<Byte>();
                 
-                while(c != -1) {
-                        if(ch == '4') {
-                                in.mark(10);
-                                ch = (char)in.read();
-                                if(ch == ':') {
-                                        in.read(check, 0, check.length);
-                                        String str = new String(check);
-                                        if(str.equals("info")) {
-                                                c = in.read();
-                                                while(c != -1) {
-                                                        b = (byte)c;
-                                                        list.add(b);
-                                                        c = in.read();
-                                                }
-                                        }
-                                        else {
-                                                in.reset();
-                                        }
-                                }
-                                else {
-                                        in.reset();     
-                                }
-                        }
-                        c = in.read();
+                while((c=in.read()) != -1) {
                         ch = (char)c;
+                        System.out.print(ch);
                 }
-                int x = list.size();
-                System.out.println(x);
-                
-                list.remove(list.size()-1);
-                Byte[] info = new Byte[list.size()];
-                info = list.toArray(info);
-
-                byte[] infodict = new byte[info.length];
-                for(int i=0; i<info.length; i++) {
-                        infodict[i] = info[i];
-                }
-                
-                byte[] sha = mesg.digest(infodict);
-                                
+        
         }
+                
 }
+
